@@ -16,7 +16,7 @@ import numpy as np
 import networkx as nx
 import os
 from gensim.models import Word2Vec
-from sklearn.linear_model.logistic import LogisticRegression
+from sklearn.linear_model import LogisticRegression
 
 
 directed = True
@@ -221,13 +221,13 @@ x_test =  np.zeros(emb_size)
 droppoint = 500
 
 for x in range(droppoint):
-    x_train = np.row_stack((x_train,model[id_list[x]]))
+    x_train = np.row_stack((x_train,model.wv[id_list[x]]))
 x_train = np.delete(x_train,[0],axis = 0)
 y_train = y[:droppoint]
 
 
 for x in range(droppoint,1500):
-    x_test = np.row_stack((x_test,model[id_list[x]]))
+    x_test = np.row_stack((x_test,model.wv[id_list[x]]))
 x_test = np.delete(x_test,[0],axis = 0)
 y_test = y[droppoint:1500]
 
