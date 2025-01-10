@@ -1,3 +1,14 @@
+import numpy as np
+import networkx as nx  # NetworkX library for graph operations
+import os
+from gensim.models import Word2Vec
+from sklearn.linear_model import LogisticRegression
+import matplotlib.pyplot as plt
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+import seaborn as sns
+
 # -*- coding: utf-8 -*-
 """
 Created on Mon May  7 21:25:07 2018
@@ -12,15 +23,9 @@ Created on Tue May  8 08:47:08 2018
 @author: dedekinds
 """
 
-import numpy as np
-import networkx as nx
-import os
-from gensim.models import Word2Vec
-from sklearn.linear_model import LogisticRegression
-
 
 directed = True
-p = 5.0#对于node2vec中的p==q时候等价于deepwwalk
+p = 1.0#对于node2vec中的p==q时候等价于deepwwalk
 q = 1.0
 num_walks = 1000
 walk_length = 100
@@ -29,7 +34,7 @@ iteration = 5
 
 
 LABEL = {
-        'Case_Based':1,
+      'Case_Based':1,
 		'Genetic_Algorithms':2,
 		'Neural_Networks':3,
 		'Probabilistic_Methods':4,
@@ -169,7 +174,7 @@ def node2vec_walk(g, start, alias_nodes, alias_edges, walk_length=30):
 
 edge_path = 'data/cora/cora.content'
 label_path = 'data/cora/cora.cites'
-model_path = './output_node2vec.model'
+model_path = './output_deepwalk.model'
 
 # load feature and adjacent matrix from file
 id_list, labels = load_features(edge_path)
@@ -199,7 +204,7 @@ else:
             walks.append(node2vec_walk(g, node, alias_nodes, alias_edges, walk_length))
 
     model = Word2Vec(walks, size=emb_size, min_count=0, sg=1, iter=iteration)
-    model.save('output_node2vec.model')
+    model.save('output_deepwalk.model')
 
 
 
@@ -241,6 +246,77 @@ y_test = y[droppoint:1500]
 classifier=LogisticRegression()
 classifier.fit(x_train,y_train)
 predictions=classifier.predict(x_test)
-print ('node2vec:')
+print ('deepwalk:')
 print (list(predictions-y_test).count(0)/1000)
 
+
+
+
+# 1. Visualize the Graph Structure
+def visualize_graph(graph, labels):
+    plt.figure(figsize=(10, 10))
+    pos = nx.spring_layout(graph)  # Spring layout for visualization
+    color_map = [LABEL[label] for label in labels]  # Use label mapping for colors
+    nx.draw(
+        graph, 
+        pos, 
+        node_color=color_map, 
+        cmap=plt.cm.jet, 
+        node_size=30, 
+        with_labels=False
+    )
+    plt.title("Graph Structure")
+    plt.show()
+
+visualize_graph(g, labels)
+
+# 2. Visualize Node Embeddings with Dimensionality Reduction
+def visualize_embeddings(embeddings, labels, method='PCA'):
+    if method == 'PCA':
+        reducer = PCA(n_components=2)
+    elif method == 'TSNE':
+        reducer = TSNE(n_components=2, random_state=42)
+    else:
+        raise ValueError("Unsupported dimensionality reduction method.")
+
+    reduced_embeddings = reducer.fit_transform(embeddings)
+    plt.figure(figsize=(10, 10))
+    scatter = plt.scatter(
+        reduced_embeddings[:, 0], 
+        reduced_embeddings[:, 1], 
+        c=[LABEL[label] for label in labels], 
+        cmap=plt.cm.jet, 
+        s=15
+    )
+    plt.colorbar(scatter, label='Label')
+    plt.title(f"Node Embeddings Visualization ({method})")
+    plt.xlabel("Component 1")
+    plt.ylabel("Component 2")
+    plt.show()
+
+# Combine embeddings and labels for training and testing
+embeddings = []
+labels_combined = []
+for idx, emb in enumerate(id_list):
+    embeddings.append(model.wv[emb])
+    labels_combined.append(labels[idx])
+
+# PCA Visualization
+visualize_embeddings(np.array(embeddings), labels_combined, method='PCA')
+
+# t-SNE Visualization
+visualize_embeddings(np.array(embeddings), labels_combined, method='TSNE')
+
+# 3. Visualize Training Results
+def visualize_results(y_test, predictions):
+    cm = confusion_matrix(y_test, predictions)
+    disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=list(LABEL.keys()))
+    disp.plot(cmap=plt.cm.Blues, values_format="d")
+    plt.title("Confusion Matrix")
+    plt.xticks(rotation=45, ha='right')
+    plt.show()
+
+    accuracy = (list(predictions - y_test).count(0) / len(y_test)) * 100
+    print(f"Accuracy: {accuracy:.2f}%")
+
+visualize_results(y_test, predictions)

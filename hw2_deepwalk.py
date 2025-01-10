@@ -20,7 +20,7 @@ from sklearn.linear_model import LogisticRegression
 
 
 directed = True
-p = 1.0#对于node2vec中的p==q时候等价于deepwwalk
+p = 1.0#对于node2vec中的p==q时候等价于deepwwalk   #For p==q in node2vec, it is equivalent to deepwwalk
 q = 1.0
 num_walks = 1000
 walk_length = 100
@@ -39,6 +39,7 @@ LABEL = {
         }
 '''
 得到Cora数据集中paper的ID和对应的分类label
+Get the ID and corresponding classification label of the paper in the Cora dataset
 '''
 def load_features(filename):
     ids, labels = [], []
@@ -56,6 +57,7 @@ def load_features(filename):
 
 '''
 根据互引用的关系构造有向图
+Constructing a directed graph based on mutual reference relationships
 '''
 def load_graph(filename, id_list):
     if directed:
@@ -112,6 +114,9 @@ def get_alias_edges(g, src, dest, p=1, q=1):
 '''
 针对节点t来说，我们得到了t能转移到不同类别节点的概率，
 常规做法是归一化之后按照概率随机选取，但这篇论文并没有直接这样做，而是选用了Alias算法进行抽样
+For node t, we get the probability that t can be transferred to different categories of nodes.
+The conventional approach is to normalize and then randomly select according to the probability, 
+but this paper does not do this directly, but uses the Alias ​​algorithm for sampling
 '''
 def get_alias_nodes(probs):
     l = len(probs)
@@ -176,6 +181,7 @@ id_list, labels = load_features(edge_path)
 g = load_graph(label_path, id_list)#print(g)
 
 
+# s7 - adding islands to the graph
 for node in id_list:
     if not g.has_node(node):
         g.add_node(node)
