@@ -115,7 +115,7 @@ def get_alias_edges(g, src, dest, p=1, q=1):
 '''
 def get_alias_nodes(probs):
     l = len(probs)
-    a, b = np.zeros(l), np.zeros(l, dtype=np.int)
+    a, b = np.zeros(l), np.zeros(l, dtype=np.int64)
     small, large = [], []
 
     for i, prob in enumerate(probs):
@@ -198,7 +198,7 @@ else:
         for node in [id_list[j] for j in r]:
             walks.append(node2vec_walk(g, node, alias_nodes, alias_edges, walk_length))
 
-    model = Word2Vec(walks, size=emb_size, min_count=0, sg=1, iter=iteration)
+    model = Word2Vec(walks, vector_size=emb_size, min_count=0, sg=1, epochs=iteration)
     model.save('output_node2vec.model')
 
 
