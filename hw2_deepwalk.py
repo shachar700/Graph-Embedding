@@ -120,7 +120,7 @@ but this paper does not do this directly, but uses the Alias ​​algorithm for
 '''
 def get_alias_nodes(probs):
     l = len(probs)
-    a, b = np.zeros(l), np.zeros(l, dtype=np.int)
+    a, b = np.zeros(l), np.zeros(l, dtype=np.int64)
     small, large = [], []
 
     for i, prob in enumerate(probs):
@@ -174,7 +174,7 @@ def node2vec_walk(g, start, alias_nodes, alias_edges, walk_length=30):
 
 edge_path = 'data/cora/cora.content'
 label_path = 'data/cora/cora.cites'
-model_path = './output_deepwalk.model'
+model_path = './output_deepwalk.models'
 
 # load feature and adjacent matrix from file
 id_list, labels = load_features(edge_path)
@@ -204,7 +204,7 @@ else:
         for node in [id_list[j] for j in r]:
             walks.append(node2vec_walk(g, node, alias_nodes, alias_edges, walk_length))
 
-    model = Word2Vec(walks, size=emb_size, min_count=0, sg=1, iter=iteration)
+    model = Word2Vec(walks, vector_size=emb_size, min_count=0, sg=1, epochs=iteration)
     model.save('output_deepwalk.model')
 
 
