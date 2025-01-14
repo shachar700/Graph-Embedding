@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix, precision_score, recall_score, f1_score, roc_auc_score
 import seaborn as sns
 
 # -*- coding: utf-8 -*-
@@ -268,7 +269,7 @@ def visualize_graph(graph, labels):
     plt.title("Graph Structure")
     plt.show()
 
-visualize_graph(g, labels)
+#visualize_graph(g, labels)
 
 # 2. Visualize Node Embeddings with Dimensionality Reduction
 def visualize_embeddings(embeddings, labels, method='PCA'):
@@ -302,10 +303,12 @@ for idx, emb in enumerate(id_list):
     labels_combined.append(labels[idx])
 
 # PCA Visualization
-visualize_embeddings(np.array(embeddings), labels_combined, method='PCA')
+#visualize_embeddings(np.array(embeddings), labels_combined, method='PCA')
 
 # t-SNE Visualization
-visualize_embeddings(np.array(embeddings), labels_combined, method='TSNE')
+#visualize_embeddings(np.array(embeddings), labels_combined, method='TSNE')
+
+from sklearn.metrics import f1_score
 
 # 3. Visualize Training Results
 def visualize_results(y_test, predictions):
@@ -318,5 +321,15 @@ def visualize_results(y_test, predictions):
 
     accuracy = (list(predictions - y_test).count(0) / len(y_test)) * 100
     print(f"Accuracy: {accuracy:.2f}%")
+    
+
+    f1_macro = f1_score(y_test, predictions, average='macro')
+    print(f"Macro-average F1 Score: {f1_macro}")
+
+    y_prob = classifier.predict_proba(x_test)[:, 1]
+    auc = roc_auc_score(y_test, y_prob)
+
+    print("\nAUC Score:", auc)
 
 visualize_results(y_test, predictions)
+

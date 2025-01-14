@@ -29,7 +29,7 @@ iteration = 5
 
 
 LABEL = {
-      'Case_Based':1,
+        'Case_Based':1,
 		'Genetic_Algorithms':2,
 		'Neural_Networks':3,
 		'Probabilistic_Methods':4,
