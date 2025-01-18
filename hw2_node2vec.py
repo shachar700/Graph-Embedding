@@ -206,9 +206,6 @@ else:
 
 
 
-
-
-
 y=[]
 for temp in range(2708):
     y.append( LABEL[labels[temp]])
@@ -243,4 +240,8 @@ classifier.fit(x_train,y_train)
 predictions=classifier.predict(x_test)
 print ('node2vec:')
 print (list(predictions-y_test).count(0)/1000)
+
+from sklearn.metrics import classification_report
+print(classification_report(y_test, predictions, target_names=LABEL.keys()))
+
 

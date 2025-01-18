@@ -26,7 +26,7 @@ Created on Tue May  8 08:47:08 2018
 
 
 directed = True
-p = 1.0#对于node2vec中的p==q时候等价于deepwwalk
+p = 5.0#对于node2vec中的p==q时候等价于deepwwalk
 q = 1.0
 num_walks = 1000
 walk_length = 100
@@ -186,7 +186,9 @@ for node in id_list:
     if not g.has_node(node):
         g.add_node(node)
         
-        
+     
+import time    
+     
 if os.path.isfile(model_path):
     model = Word2Vec.load(model_path)
     print ('load model successfully')
@@ -203,7 +205,7 @@ else:
         #idx_total+=r
         for node in [id_list[j] for j in r]:
             walks.append(node2vec_walk(g, node, alias_nodes, alias_edges, walk_length))
-
+        
     model = Word2Vec(walks, size=emb_size, min_count=0, sg=1, iter=iteration)
     model.save('output_deepwalk.model')
 
