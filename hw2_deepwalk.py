@@ -174,7 +174,7 @@ import time
 
 edge_path = 'data/cora/cora.content'
 label_path = 'data/cora/cora.cites'
-model_path = './output_deepwalk.models'
+model_path = './output_deepwalk.model'
 
 # load feature and adjacent matrix from file
 id_list, labels = load_features(edge_path)
