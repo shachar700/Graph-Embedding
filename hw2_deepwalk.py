@@ -169,9 +169,6 @@ def node2vec_walk(g, start, alias_nodes, alias_edges, walk_length=30):
 
 
 
-import time
-
-
 edge_path = 'data/cora/cora.content'
 label_path = 'data/cora/cora.cites'
 model_path = './output_deepwalk.model'
@@ -205,7 +202,6 @@ else:
         for node in [id_list[j] for j in r]:
             walks.append(node2vec_walk(g, node, alias_nodes, alias_edges, walk_length))
 
-    start_model_time = time.time()
     model = Word2Vec(walks, vector_size=emb_size, min_count=0, sg=1, epochs=iteration)
     model.save('output_deepwalk.model')
     
@@ -253,35 +249,5 @@ classifier.fit(x_train,y_train)
 predictions=classifier.predict(x_test)
 print ('deepwalk:')
 print (list(predictions-y_test).count(0)/1000)
-print(f"Total Runtime: {time.time() - start_model_time:.2f} sec")
 
-from sklearn.metrics import classification_report
-print(classification_report(y_test, predictions, target_names=LABEL.keys()))
-
-#####AUC
-from sklearn.preprocessing import label_binarize
-from sklearn.metrics import roc_auc_score, classification_report
-
-# Binarize the labels for multi-class AUC calculation
-y_test_binarized = label_binarize(y_test, classes=list(LABEL.values()))
-
-# Predict probabilities
-y_pred_probabilities = classifier.predict_proba(x_test)
-
-# Compute the AUC score for each class
-auc_scores = roc_auc_score(y_test_binarized, y_pred_probabilities, multi_class="ovr", average=None)
-
-# Compute macro-average AUC score
-macro_auc = roc_auc_score(y_test_binarized, y_pred_probabilities, multi_class="ovr", average="macro")
-
-# Print results
-print("AUC scores for each class:")
-for i, label_name in enumerate(LABEL.keys()):
-    print(f"{label_name}: {auc_scores[i]:.4f}")
-
-print(f"Macro-average AUC: {macro_auc:.4f}")
-
-# Print classification report for further details
-print("Classification Report:")
-print(classification_report(y_test, predictions, target_names=LABEL.keys()))
 

@@ -241,7 +241,5 @@ predictions=classifier.predict(x_test)
 print ('node2vec:')
 print (list(predictions-y_test).count(0)/1000)
 
-from sklearn.metrics import classification_report
-print(classification_report(y_test, predictions, target_names=LABEL.keys()))
 
 
